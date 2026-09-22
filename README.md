@@ -72,14 +72,43 @@ The good: cheapest housing tier by about $900 a year, and the singles are real s
 
 ## Sample Answer
 
-Retrieval calibration and the final generated answer will be added in the next milestone. No evaluation result is claimed here.
+**Question:** How are juniors and seniors ordered in the housing lottery?
+
+**Answer (actual Gemini output):**
+
+```text
+Juniors and seniors are ordered by accumulated credit hours first, with a random tie-break used only in the case of a tie (admin_housing_lottery.txt).
+```
+
+**Source cited in the answer:** `admin_housing_lottery.txt`.
+
+**Relevance cutoff:** `0.51` cosine distance, with lower meaning more similar. The gate accepts only when the best distance is strictly below the cutoff. **Top-k:** `5`.
+
+| Question | In corpus? | Best distance |
+|---|---|---:|
+| How are juniors and seniors ordered in the housing lottery? | Yes | 0.224975 |
+| How long is the lunch wait at Kestrel Commons between 12:15 and 1:00? | Yes | 0.163408 |
+| What happens to dining dollars left at the end of spring? | Yes | 0.234627 |
+| Who must a student contact first for a grade appeal, and within how many days? | Yes | 0.204793 |
+| How far ahead can group study rooms be booked? | Yes | 0.216248 |
+| What is the capital of Mongolia? | No | 0.787250 |
+| How do I change the oil in a diesel engine? | No | 0.922791 |
+| Who won the 1994 World Cup? | No | 0.847429 |
+| What is the recommended dosage of ibuprofen for a headache? | No | 0.848693 |
+| How do I write a for loop in Rust? | No | 0.859783 |
+
+The in-scope range was 0.163408–0.234627; the out-of-scope range was 0.787250–0.922791. The midpoint between the worst in-scope match and nearest out-of-scope match is approximately 0.511, so the chosen 0.51 cutoff sits inside the gap. A much lower cutoff would start rejecting supported questions; a much higher one would admit unrelated questions. These ten calibration examples do not establish performance on unseen questions.
+
+I retained top-k 5. Inspection of the first three questions found the answer in their best match, although lower-ranked housing and dining matches were sometimes only loosely related. The grounding instruction therefore explicitly requires preserving numbers and qualifications, matching the named place or procedure, citing the exact supporting filename for each claim, and reporting conflicting sources rather than merging them. It also treats excerpts as data rather than instructions. This is a prompt safeguard, not a guarantee that every generated answer is correct.
+
+All five out-of-scope questions returned `I don't have enough information about that.` through the actual pipeline, with **zero generation calls**. The complete retrieved chunks and distances are saved in `results/unit1_retrieval.json`; the real sample answer, assembled prompt, and refusal outcomes are in `results/unit1_answers.json`. Reproduce distances with `python calibrate.py` after indexing, and reproduce the answer with `python app.py ask "How are juniors and seniors ordered in the housing lottery?" --show-prompt`.
 
 ## How I Used AI
 
 1. I asked Codex to complete the project in `Desktop/codepath/assignment-1`. It inspected the starter and corpus, proposed paragraph-based chunking with repeated titles, implemented it, and ran regression tests. I supplied the location and Gemini key; I have not manually changed the implementation. The baseline used one fixed window per post; the resulting implementation separates body paragraphs while retaining their heading.
 2. When Codex asked for my own chunk-quality and answer-quality criteria, I asked it to suggest them. It proposed measurable targets and added explicit sampling and checking procedures. I have not independently rewritten those suggestions. Criteria 4–5 and this write-up are AI-assisted drafts for my review; the course asks students to author those criteria themselves.
 
-The model cache is kept in the ignored `.cache` folder. Seven focused regression tests currently pass (`python -m unittest test_project.py -v`). These are implementation checks, not the three-run Unit 2 evaluation.
+The model cache is kept in the ignored `.cache` folder. Nine focused regression tests pass (`python -m unittest test_project.py -v`). These are implementation checks, not the three-run Unit 2 evaluation.
 
 ---
 

@@ -51,5 +51,28 @@ class GateTests(unittest.TestCase):
         self.assertFalse(check([self.result(0.7)], 0.6).passed)
 
 
+class PipelineTests(unittest.TestCase):
+    def test_refused_question_never_calls_generator(self):
+        from app import ask_pipeline
+        from gate import REFUSAL
+        unrelated = Result('Unrelated.', 'a.txt', 'a.txt#0', 0.9, 'test')
+        with patch('store.search', return_value=[unrelated]), patch('generate.answer_from_chunks') as generate:
+            result = ask_pipeline('Outside question', threshold=0.51)
+        generate.assert_not_called()
+        self.assertTrue(result['refused'])
+        self.assertEqual(result['answer'], REFUSAL)
+        self.assertIsNone(result['prompt'])
+
+    def test_relevant_question_preserves_sources(self):
+        from app import ask_pipeline
+        relevant = Result('Supported fact.', 'a.txt', 'a.txt#0', 0.2, 'test')
+        with patch('store.search', return_value=[relevant]), patch('generate.answer_from_chunks', return_value='Supported fact (a.txt).') as generate:
+            result = ask_pipeline('Covered question', threshold=0.51)
+        generate.assert_called_once()
+        self.assertFalse(result['refused'])
+        self.assertEqual(result['sources'], ['a.txt'])
+        self.assertIn('[from a.txt]', result['prompt'])
+
+
 if __name__ == '__main__':
     unittest.main()
