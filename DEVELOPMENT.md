@@ -9,3 +9,7 @@ The original chunker produces 88 chunks from these 88 documents. The special-act
 Python 3.11.15 is used in `.venv`. All seven pinned top-level packages import. The environment check passed all ten checks, including actual 384-dimensional MiniLM embeddings, a Chroma cosine-search round trip, and a real Gemini response. The embedding archive was extracted into the ignored project cache because normal extraction encountered Windows directory permissions. `store.py` now uses this project-local model cache.
 
 AI assistance: Codex performed setup and implementation at the student's request. Personal acceptance criteria were requested from the student; the student asked for AI suggestions. The README must disclose this rather than claim unaided authorship.
+
+## Chunking decision (before implementation)
+
+Body paragraphs have a median length of 112 characters and a maximum of 373 in this corpus. Use one complete paragraph per chunk, repeating the document heading to retain the named topic. Use a 420-character body target for unusually long paragraphs: split at sentence boundaries and allow a single longer sentence rather than cut it. Use zero body overlap because each paragraph remains whole; repeating the heading supplies context without duplicating unrelated paragraphs. The 420 target accommodates the longest observed paragraph with a small margin, not an arbitrary fixed window. Short posts with a single body paragraph stay intact; dining and housing paragraphs become separately searchable.

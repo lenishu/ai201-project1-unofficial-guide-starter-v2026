@@ -1,132 +1,43 @@
 # Acceptance criteria — The Unofficial Guide
 
-Five criteria that say what "working" means for this system, written in unit 1
-**before** any results existed.
-
-An acceptance criterion names a target: a number, a count, a rate, or something
-a person could plainly observe. *"Retrieval works"* is an opinion. *"For at
-least 4 of my 5 test questions, the top results include a chunk containing the
-answer"* is a criterion.
-
-Under each one, write a sentence or two on **why that target** and not a
-stricter or looser one. A reason that says something about your corpus or your
-pipeline earns credit; *"80% seemed reasonable"* does not.
-
-> Missing your own targets next unit costs you nothing. Setting a target so
-> easy you can't miss it does.
-
----
+These targets were fixed before retrieval calibration and Unit 2 evaluation. Criteria 1–3 are provided by the course. Criteria 4–5 and the explanations were drafted with AI assistance at the student's request; they need the student's review before submission.
 
 ## 1. Retrieved chunks contain the answer
 
-For at least 4 of my 5 test questions, the retrieved chunks include one that
-contains the answer.
+For at least 4 of my 5 test questions, the retrieved chunks include one that contains the answer.
 
-**Why this target:**
-<!-- e.g. "One of my questions is about a topic only two documents mention, so
-     I expect that one to be hard." -->
+**Why this target:** The selected posts usually state a concrete answer in one paragraph. Four successes allow one difficult phrasing mismatch, while three would make the app unreliable for routine questions.
 
----
+**How to check:** For each entry in `questions.QUESTIONS`, inspect the top five chunks. Count a success only when a chunk contains the fact required by the question, not merely the same topic.
 
 ## 2. Every answer names a source
 
 Every answer the system produces names at least one source document.
 
-**Why this target:**
-<!-- Why all five and not four? What about your setup makes that achievable —
-     or what would have to go wrong for it not to be? -->
+**Why this target:** Every retrieved chunk already carries its filename, so no substantive answer should omit attribution. Students must be able to distinguish a sourced report from unsupported advice.
 
----
+**How to check:** All five generated test answers must name at least one actual retrieved filename. A gate refusal is an abstention, not a factual answer; do not invent a citation for it.
 
 ## 3. The relevance gate stops out-of-corpus questions
 
-When I ask a question my documents clearly don't cover, the relevance gate
-stops it and the system returns "I don't have enough information about that" —
-in at least 4 of 5 tries.
+When I ask a question my documents clearly don't cover, the relevance gate stops it and the system returns "I don't have enough information about that" — in at least 4 of 5 tries.
 
-<!-- The five questions are the ones in `OUT_OF_SCOPE` at the bottom of
-     `questions.py`, and `run_eval.py` puts them through the gate and writes
-     what happened into your run log. Swap them for your own if you'd rather —
-     just keep five of them, or the "4 of 5" above has nothing to be 4 of. -->
+**Why this target:** The corpus concerns campus experiences, so unrelated questions should normally be rejected. Allowing one ambiguous semantic match acknowledges that similarity is not a proof of coverage, but allowing two would be too many unsupported requests reaching the model.
 
-**Why this target:**
-<!-- What did your distances look like when you set the cutoff in Milestone 4?
-     Was there a clean gap, or did the two groups overlap? -->
+**How to check:** Use the five questions in `OUT_OF_SCOPE`. Count only refusals made before generation; the model's own refusal does not count as a gate success.
 
----
+## 4. Chunks are understandable in isolation
 
-## 4. Something about your chunks
+At least 9 of 10 sampled chunks must identify their topic and contain at least one complete, uncut factual sentence that can be understood without an adjacent chunk.
 
-<!-- YOU WRITE THIS ONE.
+**Why this target:** These short posts often name a course, residence, or dining hall only in their heading. A high target tests whether splitting preserves that context; allowing one failure exposes an edge case without accepting widespread fragments.
 
-     How would you know if your chunks were the right size? Name something
-     countable or observable.
+**How to check:** Sort documents by filename and preserve chunk order. For N chunks, inspect indices floor(i × (N − 1) / 9), for i = 0 through 9. Check topic identification and a complete self-contained factual sentence; both must pass.
 
-     Examples of the right shape — don't copy these, they should come from
-     what you actually saw in Milestone 3:
-       - "At least 4 of 5 sampled chunks read as a complete thought, with no
-          sentence cut in half at either end."
-       - "No chunk is shorter than 200 characters, since anything below that
-          in my corpus turned out to be a heading with no content under it." -->
+## 5. Answers contain supported facts
 
+At least 4 of the 5 test answers must contain the expected fact specified in `questions.py`, and every factual claim in each of those successful answers must be supported by the documents it cites.
 
+**Why this target:** A filename alone does not establish correctness. Campus deadlines and eligibility rules include qualifications that a plausible-sounding summary can lose; four fully supported answers is more useful than five fluent answers with invented details.
 
-**Why this target:**
-
-
-
----
-
-## 5. Your choice
-
-<!-- YOU WRITE THIS ONE TOO.
-
-     Pick something you actually care about getting right. It could be about
-     speed, about refusals, about a particular kind of question your corpus
-     handles badly, about source attribution being correct rather than merely
-     present — anything, as long as it names a number or an observable
-     outcome. -->
-
-
-
-**Why this target:**
-
-
-
----
-
-<!-- ─────────────────────────────────────────────────────────────────────────
-     UNIT 2 — read this before you change anything above.
-
-     If a criterion turns out to be BROKEN rather than merely unmet, you can
-     revise it, and that earns credit. But never delete or edit the original
-     line. Add the revision underneath it, like this:
-
-         ## 1. Retrieved chunks contain the answer
-
-         For at least 4 of my 5 test questions, the retrieved chunks include
-         one that contains the answer.
-
-         **Why this target:** ...
-
-         > **Revised in unit 2:** For at least 4 of 5 questions, the top three
-         > results contain the answer.
-         >
-         > **Why revised:** I couldn't judge "the chunks include one that
-         > contains the answer" the same way twice — I scored two questions
-         > differently on Monday than on Wednesday. The new version is
-         > something I can actually check.
-
-     That's a revision because the criterion couldn't be MEASURED.
-
-     Lowering a target because you missed it is not a revision, and it costs
-     you the point:
-
-         ✗ "I said 4 of 5 but got 2 of 5, so 2 of 5 is more realistic."
-
-     A number you missed stays where it is, gets diagnosed, and gets a fix
-     attempted. That's where the points are.
-
-     The whole reason the originals stay visible is so someone can see what you
-     said before you knew the answer.
-     ───────────────────────────────────────────────────────────────────────── -->
+**How to check:** Check the `expects` phrase case-insensitively, then read the cited documents and verify every factual claim. A phrase match with a wrong qualification fails. Keep the original targets unchanged for Unit 2, recording any necessary clarification beneath them.
