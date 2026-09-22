@@ -1,0 +1,69 @@
+{
+  "out_of_scope": [
+    {
+      "question": "What is the capital of Mongolia?",
+      "refused": true,
+      "best_distance": 0.7872501611709595,
+      "threshold": 0.51,
+      "sources": [],
+      "prompt": null,
+      "answer": "I don't have enough information about that.",
+      "model_calls": 0
+    },
+    {
+      "question": "How do I change the oil in a diesel engine?",
+      "refused": true,
+      "best_distance": 0.9227911233901978,
+      "threshold": 0.51,
+      "sources": [],
+      "prompt": null,
+      "answer": "I don't have enough information about that.",
+      "model_calls": 0
+    },
+    {
+      "question": "Who won the 1994 World Cup?",
+      "refused": true,
+      "best_distance": 0.8474286794662476,
+      "threshold": 0.51,
+      "sources": [],
+      "prompt": null,
+      "answer": "I don't have enough information about that.",
+      "model_calls": 0
+    },
+    {
+      "question": "What is the recommended dosage of ibuprofen for a headache?",
+      "refused": true,
+      "best_distance": 0.848693217919505,
+      "threshold": 0.51,
+      "sources": [],
+      "prompt": null,
+      "answer": "I don't have enough information about that.",
+      "model_calls": 0
+    },
+    {
+      "question": "How do I write a for loop in Rust?",
+      "refused": true,
+      "best_distance": 0.8597826957702637,
+      "threshold": 0.51,
+      "sources": [],
+      "prompt": null,
+      "answer": "I don't have enough information about that.",
+      "model_calls": 0
+    }
+  ],
+  "sample": {
+    "question": "How are juniors and seniors ordered in the housing lottery?",
+    "refused": false,
+    "best_distance": 0.22497451305389404,
+    "threshold": 0.51,
+    "sources": [
+      "admin_housing_lottery.txt",
+      "advising_registration.txt",
+      "housing_aldridge_hall.txt",
+      "housing_calder_annexe.txt",
+      "housing_morrow_house.txt"
+    ],
+    "prompt": "Documents:\n\n[from admin_housing_lottery.txt]\nOn the housing lottery\n\nThe housing lottery is not random in the way most people assume. Rising sophomores get a number drawn at random, but juniors and seniors are ordered by accumulated credit hours first, and only tie-break randomly. That means a senior who took summer courses reliably beats a senior who didn't. Numbers come out the second week of March and selection runs over four evenings.\n\n[from housing_morrow_house.txt]\nMorrow House — what it's actually like\n\nThe good: cheapest housing tier by about $900 a year, and the singles are real singles.\n\n[from housing_aldridge_hall.txt]\nAldridge Hall — what it's actually like\n\nI lived here my sophomore year. Built 1968, renovated 2019. Rooms are doubles with a shared bathroom per floor.\n\n[from advising_registration.txt]\nRegistration and your adviser\n\nRegistration times are staggered by credit hours, same as the housing lottery. Popular courses fill in the first two days.\n\n[from housing_calder_annexe.txt]\nCalder Annexe — what it's actually like\n\nSecond-year here. Built 2003. Rooms are mostly singles, some doubles, in clusters of six around a lounge.\n\n---\n\nQuestion: How are juniors and seniors ordered in the housing lottery?\n\nAnswer using only the documents above, and name the file you used.",
+    "answer": "Juniors and seniors are ordered by accumulated credit hours first, with a random tie-break used only in the case of a tie (admin_housing_lottery.txt)."
+  }
+}
