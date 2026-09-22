@@ -1,129 +1,85 @@
 # The Unofficial Guide
 
-<!-- Replace this line with your name and which corpus you picked. -->
-
-> **This file is your submission.** Fill it in as you go — most sections get
-> written during the milestone that produces them, not at the end.
->
-> How the starter works, and every command you'll need, is in `RUNNING.md`.
-> Leave that file alone.
->
-> **Paste everything as text.** No screenshots, no video. A typed table gets
-> full credit; a picture of the same table gets none.
->
-> Delete these instruction blocks as you replace them. The `<!-- -->` comments
-> are notes to you and don't show up when the page renders — you can leave them
-> or remove them.
-
----
-
 # Unit 1
 
 ## What This Does
 
-<!-- Three or four sentences. Which corpus you picked, and the kinds of
-     questions your system answers. Write it for someone who has never seen
-     this repo.
+This command-line app searches 88 fictional campus-life posts supplied by CodePath. It answers questions about housing, dining, courses, and campus procedures using local MiniLM embeddings and a Chroma vector store. A cosine-distance gate rejects unrelated questions before Gemini runs, and Gemini receives only retrieved excerpts with filenames. The posts are course material, not verified policies for a real university.
 
-     Milestone 5. -->
+Run with Python 3.11–3.13: create a virtual environment, install `requirements.txt`, copy `.env.example` to `.env`, and set `GEMINI_API_KEY` locally. Then run `python app.py index` and `python app.py ask "Is the housing lottery random?"`. Use `python app.py ask` for an interactive session. See the unchanged `RUNNING.md` for all commands. Never commit `.env`.
 
 ## Chunking Strategy
 
-**Chunk size:**
-**Overlap:**
+**Chunk size:** One body paragraph, with a 420-character soft body target for unusually long paragraphs. The repeated title is additional context, so 420 is not a hard total-length limit. **Overlap:** Zero body characters; the document heading repeats in each chunk.
 
-<!-- What about YOUR documents made you pick these numbers? Short posts and
-     long sectioned guides don't want the same chunking, and "800 seemed
-     reasonable" earns nothing. Point at something you noticed when you read
-     the documents in Milestone 1.
+The original 800-character windows produced 88 chunks from 88 documents (average 317, shortest 178, longest 549). In the source documents, the 183 body paragraphs have median length 112 and maximum length 373. A paragraph is therefore a natural unit: dining wait times and opening hours become separate chunks, while a short administrative explanation stays whole. The 420 target accommodates the longest observed paragraph with a small margin. Longer paragraphs split at sentence boundaries, and a single overlong sentence remains whole rather than being truncated. This trades some cross-paragraph context for more focused retrieval; repeating the title preserves which hall or course each paragraph describes.
 
-     If you changed your mind partway through, say so and say why. That's worth
-     more than pretending you got it right first time.
+The provided corpus is already free of navigation and ads. Ingestion normalizes line endings, repeated blank lines, spaces, and tabs while preserving paragraph boundaries and source filenames. It does not claim to clean arbitrary scraped HTML.
 
-     Milestone 3. -->
+Current output: 183 chunks, 167 characters on average (shortest 63, longest 397), produced by chunker.py::split_documents.
 
 ## Sample Chunks
 
-<!-- Five chunks, pasted as text. Label each one and name the file it came from
-     AND the function that produced it — the grader checks your code against
-     what you claim here.
+### Chunk 1
 
-     `python app.py chunks -n 5` prints all three for you. Copy them straight
-     across.
+Source: `admin_add_drop_deadline.txt#0`. Produced by: `chunker.py::split_documents`.
 
-     Milestone 3. -->
+```text
+On the add/drop deadline
 
-**Chunk 1** — source: `` — produced by: ``
-
-```
+You can add a course through the end of the second week. Dropping is a longer window — through the end of week six — but a drop after week two shows as a W on your transcript. Nothing anywhere on the registrar's site says this plainly, and students find out from each other.
 ```
 
-**Chunk 2** — source: `` — produced by: ``
+### Chunk 2
 
-```
-```
+Source: `course_cs_340_exams.txt#1`. Produced by: `chunker.py::split_documents`.
 
-**Chunk 3** — source: `` — produced by: ``
+```text
+CS 340 Databases — assessment
 
-```
-```
-
-**Chunk 4** — source: `` — produced by: ``
-
-```
+Start the term project in week three, not week eight; everyone learns this the hard way.
 ```
 
-**Chunk 5** — source: `` — produced by: ``
+### Chunk 3
 
+Source: `course_phys_130_workload.txt#0`. Produced by: `chunker.py::split_documents`.
+
+```text
+Workload for PHYS 130 Mechanics
+
+People keep asking so: 7 hours a week, plus 3 on lab weeks. That's real time, not optimistic time.
 ```
+
+### Chunk 4
+
+Source: `dining_verrill_street_grill_followup.txt#1`. Produced by: `chunker.py::split_documents`.
+
+```text
+Re: Verrill Street Grill
+
+Also worth saying: one register, so the queue is a single line no matter how busy. Nobody tells you this at orientation.
+```
+
+### Chunk 5
+
+Source: `housing_morrow_house.txt#1`. Produced by: `chunker.py::split_documents`.
+
+```text
+Morrow House — what it's actually like
+
+The good: cheapest housing tier by about $900 a year, and the singles are real singles.
 ```
 
 ## Sample Answer
 
-<!-- One complete question and answer, pasted as text, with the source line
-     visible. Milestone 4. -->
-
-**Question:**
-
-**Answer:**
-
-```
-```
-
-**My relevance cutoff:**
-
-<!-- The number you set in config.py, and how you got there.
-
-     You ran five questions your corpus covers and the five in OUT_OF_SCOPE
-     that it clearly doesn't, and wrote down the best distance for each. What
-     did those two groups look like? Where was the gap? Put the actual numbers
-     here — the table below wants all ten rows.
-
-     Milestone 4. -->
-
-| Question | In corpus? | Best distance |
-|---|---|---|
-|  |  |  |
+Retrieval calibration and the final generated answer will be added in the next milestone. No evaluation result is claimed here.
 
 ## How I Used AI
 
-<!-- Two specific moments. For each: what you asked for, what came back, and
-     what you changed about it.
+1. I asked Codex to complete the project in `Desktop/codepath/assignment-1`. It inspected the starter and corpus, proposed paragraph-based chunking with repeated titles, implemented it, and ran regression tests. I supplied the location and Gemini key; I have not manually changed the implementation. The baseline used one fixed window per post; the resulting implementation separates body paragraphs while retaining their heading.
+2. When Codex asked for my own chunk-quality and answer-quality criteria, I asked it to suggest them. It proposed measurable targets and added explicit sampling and checking procedures. I have not independently rewritten those suggestions. Criteria 4–5 and this write-up are AI-assisted drafts for my review; the course asks students to author those criteria themselves.
 
-     "I asked Claude to write the chunking function from my notes. It ignored
-     the overlap, so I added that myself" is the level of detail we're after.
-     "I used AI to help me code" is not.
-
-     Milestone 5. -->
-
-**1.**
-
-**2.**
-
-<!-- ── Stretch features ─────────────────────────────────────────────────────
-     Doing one? Say so here BEFORE you start. A feature this README never
-     claims earns nothing.
-     ───────────────────────────────────────────────────────────────────────── -->
+The model cache is kept in the ignored `.cache` folder. Seven focused regression tests currently pass (`python -m unittest test_project.py -v`). These are implementation checks, not the three-run Unit 2 evaluation.
 
 ---
 
