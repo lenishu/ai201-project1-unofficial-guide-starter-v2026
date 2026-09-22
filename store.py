@@ -63,6 +63,8 @@ class _OnnxEmbedder:
     def __init__(self):
         from chromadb.utils.embedding_functions import ONNXMiniLM_L6_V2
 
+        # Keep downloaded weights beside the project, inside the ignored cache.
+        ONNXMiniLM_L6_V2.DOWNLOAD_PATH = config.CACHE_DIR / "onnx_models" / BUNDLED_MODEL
         self._ef = ONNXMiniLM_L6_V2()
 
     def encode(self, texts, show_progress_bar: bool = False):
